@@ -14,12 +14,31 @@ datasource db {
 }
 
 model User {
-id String @default(uuid()) @id
-firstname String
-lastname String
-username String @unique
-email String @unique
-password String
+  id        String @id @default(uuid())
+  firstname String
+  lastname  String
+  username  String @unique
+  email     String @unique
+  password  String
+  pools     Pool[]
 
-@@map("users")
+  @@map("users")
+}
+
+model Pool {
+  id             String   @id @default(uuid())
+  location       String
+  day            String
+  destination    String
+  departureTime  DateTime
+  carType        String
+  seatsAvailable Int
+  peakPoint      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  owner          String
+  user           User     @relation(fields: [owner], references: [id], onDelete: Cascade)
+
+   @@index([location])
+  @@index([day])
 }
