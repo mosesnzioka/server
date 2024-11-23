@@ -34,11 +34,15 @@ model Pool {
   carType        String
   seatsAvailable Int
   peakPoint      String
+  cost           Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   owner          String
   user           User     @relation(fields: [owner], references: [id], onDelete: Cascade)
 
    @@index([location])
-  @@index([day])
+   @@index([day])
+
+  @@map("pools")
 }
+
