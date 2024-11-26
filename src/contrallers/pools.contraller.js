@@ -3,17 +3,14 @@ const prisma = new PrismaClient();
 
 export async function Createpool(req, res) {
   try {
-    const {
-      location,
-      day,
-      destination,
-      departureTime,
-      carType,
-      seatsAvailable,
-      peakPoint,
-      cost,
-    } = req.body;
+    console.log("Request body:", req.body);
+    const { location, day, destination, departureTime, carType, seatsAvailable, peakPoint, cost } = req.body;
     const userId = req.userId;
+
+    if (!userId) {
+      console.error("User ID is missing or invalid");
+      return res.status(400).json({ message: "User ID is missing or invalid" });
+    }
 
     const parsedDepartureTime = new Date(departureTime);
     if (isNaN(parsedDepartureTime.getTime())) {
@@ -27,6 +24,12 @@ export async function Createpool(req, res) {
       return res.status(400).json({ message: "Invalid cost format" });
     }
 
+    const parsedSeatsAvailable = parseInt(seatsAvailable, 10);
+    if (isNaN(parsedSeatsAvailable)) {
+      console.error("Invalid seatsAvailable format:", seatsAvailable);
+      return res.status(400).json({ message: "Invalid seatsAvailable format" });
+    }
+
     const newPool = await prisma.pool.create({
       data: {
         location,
@@ -34,18 +37,26 @@ export async function Createpool(req, res) {
         destination,
         departureTime: parsedDepartureTime.toISOString(),
         carType,
-        seatsAvailable: parseInt(seatsAvailable, 10),
+        seatsAvailable: parsedSeatsAvailable,
         peakPoint,
         cost: parsedCost,
         owner: userId,
       },
     });
 
+    console.log("New pool created:", newPool);
     res.status(200).json(newPool);
   } catch (error) {
+    console.error("Error creating pool:", error);
     res.status(500).json({ message: error.message });
   }
 }
+
+
+
+
+
+
 
 export async function fetchsinglePool(req, res) {
   try {
@@ -69,6 +80,8 @@ export async function fetchsinglePool(req, res) {
   }
 }
 
+
+
 export async function FetchingAllPools(req, res) {
   try {
     const pools = await prisma.pool.findMany({
@@ -81,3 +94,4 @@ export async function FetchingAllPools(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+

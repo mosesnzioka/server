@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieparser from "cookie-parser";
-import { LoginUser } from "./contrallers/auth.controller.js";
+import { LoginUser, logoutUser } from "./contrallers/auth.controller.js";
 import { RegisterUser } from "./contrallers/user.contraller.js";
 import {
   Createpool,
@@ -29,5 +29,8 @@ app.post("/auth/login", LoginUser);
 app.post("/pool", verifyToken, Createpool);
 app.get("/pool/:id", verifyToken, fetchsinglePool);
 app.get("/pools", verifyToken, FetchingAllPools);
+
+app.post("/logout", verifyToken, logoutUser);
+
 
 app.listen(4000, () => console.log("server running..."));
