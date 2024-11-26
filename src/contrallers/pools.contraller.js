@@ -69,17 +69,15 @@ export async function fetchsinglePool(req, res) {
   }
 }
 
-
-export async function FetchingAllPools(req,res){
-  try{
+export async function FetchingAllPools(req, res) {
+  try {
     const pools = await prisma.pool.findMany({
-      include:{
-        user: true
-      }
-      
-    })
+      include: {
+        user: true,
+      },
+    });
     res.status(200).json(pools);
-  }catch (error){
-    res.status(500).json({message: error.message})
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 }
