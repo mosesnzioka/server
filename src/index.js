@@ -32,5 +32,4 @@ app.get("/pools", verifyToken, FetchingAllPools);
 
 app.post("/logout", verifyToken, logoutUser);
 
-
 app.listen(4000, () => console.log("server running..."));

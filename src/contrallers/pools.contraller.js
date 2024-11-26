@@ -4,7 +4,16 @@ const prisma = new PrismaClient();
 export async function Createpool(req, res) {
   try {
     console.log("Request body:", req.body);
-    const { location, day, destination, departureTime, carType, seatsAvailable, peakPoint, cost } = req.body;
+    const {
+      location,
+      day,
+      destination,
+      departureTime,
+      carType,
+      seatsAvailable,
+      peakPoint,
+      cost,
+    } = req.body;
     const userId = req.userId;
 
     if (!userId) {
@@ -52,12 +61,6 @@ export async function Createpool(req, res) {
   }
 }
 
-
-
-
-
-
-
 export async function fetchsinglePool(req, res) {
   try {
     const { id } = req.params;
@@ -80,8 +83,6 @@ export async function fetchsinglePool(req, res) {
   }
 }
 
-
-
 export async function FetchingAllPools(req, res) {
   try {
     const pools = await prisma.pool.findMany({
@@ -94,4 +95,3 @@ export async function FetchingAllPools(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
-

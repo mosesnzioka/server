@@ -29,8 +29,6 @@ export const LoginUser = async (req, res) => {
   }
 };
 
-
-
 export const logoutUser = (req, res) => {
   try {
     // Clear the authToken cookie
