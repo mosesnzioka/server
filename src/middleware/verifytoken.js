@@ -10,8 +10,8 @@ function verifyToken(req, res, next) {
     if (err) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    req.userId = decoded.id; // Ensure the correct user ID is set
-    console.log("Decoded user ID:", req.userId);
+    req.userId = decoded.id;
+    
     next();
   });
 }

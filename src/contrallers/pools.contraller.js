@@ -53,7 +53,6 @@ export async function Createpool(req, res) {
       },
     });
 
-    console.log("New pool created:", newPool);
     res.status(200).json(newPool);
   } catch (error) {
     console.error("Error creating pool:", error);
@@ -93,5 +92,14 @@ export async function FetchingAllPools(req, res) {
     res.status(200).json(pools);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+}
+
+
+export function getDriversPool(req,res){
+  try{
+    res.send("fetching a pool for a driver")
+  }catch(error){
+    res.status(500).json({message: error.message})
   }
 }

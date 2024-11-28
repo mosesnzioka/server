@@ -5,6 +5,11 @@ export const RegisterUser = async (req, res) => {
   try {
     const { firstName, lastName, username, email, password } = req.body;
     const hashedpassword = await bcrypt.hash(password, 8);
+
+    if (!firstName || !lastName || !username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
     const newUser = await client.user.create({
       data: {
         firstname: firstName,

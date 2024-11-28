@@ -20,7 +20,10 @@ model User {
   username  String @unique
   email     String @unique
   password  String
+  
   pools     Pool[]
+  sentNotifications    Notification[] @relation("SentNotifications")
+  receivedNotifications Notification[] @relation("ReceivedNotifications")
 
   @@map("users")
 }
@@ -38,11 +41,31 @@ model Pool {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   owner          String
+
   user           User     @relation(fields: [owner], references: [id], onDelete: Cascade)
+  notifications  Notification[] @relation("PoolNotifications")
 
    @@index([location])
    @@index([day])
 
   @@map("pools")
+}
+
+
+model Notification {
+  id          String   @id @default(uuid())
+  message     String
+  senderId    String
+  receiverId  String
+  poolId      String
+  createdAt   DateTime @default(now())
+  isRead      Boolean  @default(false)
+  status      String   @default("pending")
+
+  sender      User     @relation("SentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("ReceivedNotifications", fields: [receiverId], references: [id], onDelete: Cascade)
+  pool        Pool     @relation("PoolNotifications", fields: [poolId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
