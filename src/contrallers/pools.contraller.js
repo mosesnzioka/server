@@ -95,11 +95,10 @@ export async function FetchingAllPools(req, res) {
   }
 }
 
-
-export function getDriversPool(req,res){
-  try{
-    res.send("fetching a pool for a driver")
-  }catch(error){
-    res.status(500).json({message: error.message})
+export function getDriversPool(req, res) {
+  try {
+    res.send("fetching a pool for a driver");
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 }

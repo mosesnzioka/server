@@ -1,16 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
 
 export async function createNotification(req, res) {
   const { receiverId, poolId, message } = req.body;
   const senderId = req.userId;
 
   try {
-    
-    const senderExists = await prisma.user.findUnique({ where: { id: senderId } });
-    const receiverExists = await prisma.user.findUnique({ where: { id: receiverId } });
+    const senderExists = await prisma.user.findUnique({
+      where: { id: senderId },
+    });
+    const receiverExists = await prisma.user.findUnique({
+      where: { id: receiverId },
+    });
     const poolExists = await prisma.pool.findUnique({ where: { id: poolId } });
 
     if (!senderExists) {
@@ -23,7 +25,6 @@ export async function createNotification(req, res) {
       return res.status(400).json({ message: "Invalid poolId" });
     }
 
-  
     const notification = await prisma.notification.create({
       data: { message, senderId, receiverId, poolId },
     });
@@ -34,7 +35,6 @@ export async function createNotification(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
 
 export async function currentUser(req, res) {
   const userId = req.userId;
@@ -57,41 +57,44 @@ export async function currentUser(req, res) {
   }
 }
 
-
 export async function updateNotificationStatus(req, res) {
-    const { notificationId, status } = req.body;
-  
-    if (!["accepted", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value" });
-    }
-  
-    try {
-      const notification = await prisma.notification.update({
-        where: { id: notificationId },
-        data: { status },
-      });
-  
-      res.status(200).json(notification);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+  const { notificationId, status } = req.body;
+
+  try {
+    const updatedNotification = await prisma.notification.update({
+      where: { id: notificationId },
+      data: { status },
+      include: { sender: true, receiver: true },
+    });
+
+    await prisma.notification.create({
+      data: {
+        message: `Your request has been ${status} by ${updatedNotification.receiver.firstname} ${updatedNotification.receiver.lastname}`,
+        senderId: updatedNotification.receiverId,
+        receiverId: updatedNotification.senderId,
+        poolId: updatedNotification.poolId,
+      },
+    });
+
+    res.status(200).json(updatedNotification);
+  } catch (error) {
+    console.error("Error updating notification status:", error);
+    res.status(500).json({ message: "Failed to update notification status" });
   }
-  
+}
 
-
-  // controllers/notificationController.js
 export async function getDriverNotifications(req, res) {
-  const driverId = req.userId; // Get the logged-in driver's ID from the token
+  const driverId = req.userId;
 
   try {
     const notifications = await prisma.notification.findMany({
       where: { receiverId: driverId },
       include: {
         sender: {
-          select: { firstname: true, lastname: true }, // Include sender details
+          select: { firstname: true, lastname: true },
         },
         pool: {
-          select: { location: true, destination: true }, // Include pool details
+          select: { location: true, destination: true },
         },
       },
     });
@@ -100,5 +103,22 @@ export async function getDriverNotifications(req, res) {
   } catch (error) {
     console.error("Error fetching notifications:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function deleteNotification(req, res) {
+  const { id } = req.params;
+
+  try {
+    const notification = await prisma.notification.delete({
+      where: { id },
+    });
+
+    res
+      .status(200)
+      .json({ message: "Notification deleted successfully", notification });
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    res.status(500).json({ message: "Failed to delete notification" });
   }
 }
