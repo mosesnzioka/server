@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 export async function Createpool(req, res) {
   try {
-    console.log("Request body:", req.body);
     const {
       location,
       day,
@@ -98,6 +97,43 @@ export async function FetchingAllPools(req, res) {
 export function getDriversPool(req, res) {
   try {
     res.send("fetching a pool for a driver");
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+export async function fetchpoolforuser(req, res){
+  try{
+    const userId = req.userId;
+    const pools = await prisma.pool.findMany({
+      where: { owner: userId },
+      select: {
+        id: true,
+        location: true,
+        day: true,
+        destination: true,
+        carType: true,
+        seatsAvailable: true,
+        cost: true,
+        createdAt: true,
+      },
+    });
+    
+
+    res.status(200).json(pools);
+
+  }catch(error){
+    res.status(500).json({message: error.message})
+  }
+}
+
+
+export async function Deleteuserspool (req, res){
+  try {
+    const { id } = req.params;
+    await prisma.pool.delete({ where: { id } });
+    res.status(200).json({ message: "Pool deleted successfully!" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

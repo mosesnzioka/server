@@ -49,3 +49,38 @@ export const RegisterUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
+
+
+
+
+export const UpdateUseinfo = async (req, res) => {
+  try {
+    const { firstname, lastname, email, username } = req.body;
+    const userId = req.userId;
+
+  
+    if (!firstname || !lastname || !email || !username) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await client.user.update({
+      where: { id: userId },
+      data: { firstname, lastname, email, username },
+    });
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error Updating User:", error);
+    res.status(500).json({ message: error.message, meta: error.meta });
+  }
+};
+
+

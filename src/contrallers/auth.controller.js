@@ -42,3 +42,36 @@ export const logoutUser = (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+export const updatePassword = async (req, res) => {
+  try {
+    const { previousPassword, newPassword } = req.body;
+    const userId = req.userId;
+
+    
+    const user = await client.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+   
+    const isMatch = await bcrypt.compare(previousPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect previous password." });
+    }
+
+    
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await client.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    res.status(200).json({ message: "Password updated successfully." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
